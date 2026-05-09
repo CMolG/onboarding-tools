@@ -1,0 +1,252 @@
+:root {
+  --ot-color-backdrop: rgb(2 6 23 / 58%);
+  --ot-color-surface: #ffffff;
+  --ot-color-surface-translucent: rgb(255 255 255 / 95%);
+  --ot-color-text: #0f172a;
+  --ot-color-muted: #64748b;
+  --ot-color-primary: #c25b3c;
+  --ot-color-primary-foreground: #ffffff;
+  --ot-color-primary-soft: rgb(194 91 60 / 12%);
+  --ot-color-warning: #b45309;
+  --ot-radius-card: 18px;
+  --ot-radius-control: 10px;
+  --ot-shadow-card: 0 24px 80px rgb(15 23 42 / 24%);
+  --ot-shadow-spotlight: 0 0 0 4px rgb(194 91 60 / 18%), 0 0 28px rgb(194 91 60 / 26%);
+  --ot-z-overlay: 70;
+  --ot-z-tutorial: 80;
+  --ot-font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.unlockable-effect-reveal {
+  position: relative;
+  overflow: hidden;
+  animation:
+    unlockable-materialize 1100ms cubic-bezier(0.16, 1, 0.3, 1),
+    unlockable-activation-ring 1200ms ease-out;
+  transform-origin: left center;
+  will-change: clip-path, filter, transform, opacity;
+}
+
+.unlockable-effect-reveal::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background: linear-gradient(105deg, transparent 0%, rgb(255 255 255 / 0%) 36%, rgb(255 255 255 / 68%) 50%, transparent 64%);
+  animation: unlockable-light-scan 960ms ease-out both;
+  mix-blend-mode: screen;
+}
+
+.ot-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--ot-z-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  font-family: var(--ot-font-family);
+  background: rgb(15 23 42 / 45%);
+  backdrop-filter: blur(6px);
+}
+
+.ot-overlay-card,
+.ot-tutorial-card {
+  box-sizing: border-box;
+  width: min(100%, 28rem);
+  color: var(--ot-color-text);
+  background: var(--ot-color-surface);
+  border: 1px solid rgb(194 91 60 / 20%);
+  border-radius: var(--ot-radius-card);
+  box-shadow: var(--ot-shadow-card);
+}
+
+.ot-overlay-card {
+  padding: 1.25rem;
+}
+
+.ot-overlay-eyebrow,
+.ot-tutorial-progress {
+  display: inline-flex;
+  margin-bottom: 0.75rem;
+  padding: 0.25rem 0.625rem;
+  color: var(--ot-color-primary);
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--ot-color-primary-soft);
+  border-radius: 999px;
+}
+
+.ot-overlay-title,
+.ot-tutorial-title {
+  margin: 0;
+  color: var(--ot-color-text);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.ot-overlay-body,
+.ot-tutorial-body,
+.ot-tutorial-note {
+  margin: 0.5rem 0 0;
+  color: var(--ot-color-muted);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.ot-tutorial-note {
+  color: var(--ot-color-warning);
+  font-size: 0.75rem;
+}
+
+.ot-overlay-actions,
+.ot-tutorial-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.ot-button {
+  appearance: none;
+  border: 0;
+  border-radius: var(--ot-radius-control);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.625rem 0.875rem;
+  transition: background-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.ot-button:focus-visible {
+  outline: 2px solid var(--ot-color-primary);
+  outline-offset: 2px;
+}
+
+.ot-button:hover {
+  transform: translateY(-1px);
+}
+
+.ot-button-primary {
+  color: var(--ot-color-primary-foreground);
+  background: var(--ot-color-primary);
+}
+
+.ot-button-secondary {
+  color: var(--ot-color-muted);
+  background: transparent;
+}
+
+.ot-button-secondary:hover {
+  background: rgb(100 116 139 / 10%);
+}
+
+.ot-tutorial-root {
+  position: fixed;
+  inset: 0;
+  z-index: var(--ot-z-tutorial);
+  font-family: var(--ot-font-family);
+}
+
+.ot-tutorial-click-shield {
+  position: fixed;
+  inset: 0;
+  z-index: var(--ot-z-tutorial);
+}
+
+.ot-tutorial-card {
+  position: fixed;
+  z-index: calc(var(--ot-z-tutorial) + 1);
+  width: min(340px, calc(100vw - 48px));
+  padding: 1rem;
+  background: var(--ot-color-surface-translucent);
+  backdrop-filter: blur(12px);
+}
+
+.ot-tutorial-progress {
+  margin-bottom: 0.25rem;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+}
+
+.ot-tutorial-spotlight {
+  position: fixed;
+  inset: 0;
+  z-index: var(--ot-z-tutorial);
+  pointer-events: none;
+}
+
+.ot-tutorial-mask {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+.ot-tutorial-spotlight-ring {
+  position: fixed;
+  border: 2px solid color-mix(in srgb, var(--ot-color-primary) 72%, transparent);
+  border-radius: 12px;
+  box-shadow: var(--ot-shadow-spotlight);
+}
+
+@keyframes unlockable-materialize {
+  0% {
+    opacity: 0;
+    transform: translateX(-18px) scale(0.96);
+    filter: saturate(0) brightness(1.12);
+    clip-path: inset(0 100% 0 0 round 12px);
+  }
+  32% {
+    opacity: 1;
+    transform: translateX(0) scale(1.01);
+    filter: saturate(0.35) brightness(1.08);
+    clip-path: inset(0 42% 0 0 round 12px);
+  }
+  62% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: saturate(1.05) brightness(1.03);
+    clip-path: inset(0 0 0 0 round 12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: none;
+    clip-path: inset(0 0 0 0 round 12px);
+  }
+}
+
+@keyframes unlockable-light-scan {
+  0% { transform: translateX(-130%) skewX(-18deg); opacity: 0; }
+  18% { opacity: 0.95; }
+  78% { opacity: 0.9; }
+  100% { transform: translateX(130%) skewX(-18deg); opacity: 0; }
+}
+
+@keyframes unlockable-activation-ring {
+  0% { box-shadow: 0 0 0 0 rgb(194 91 60 / 0%), 0 0 0 0 rgb(194 91 60 / 0%); }
+  45% { box-shadow: 0 0 0 2px rgb(194 91 60 / 45%), 0 0 30px rgb(194 91 60 / 32%); }
+  100% { box-shadow: 0 0 0 0 rgb(194 91 60 / 0%), 0 0 0 0 rgb(194 91 60 / 0%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .unlockable-effect-reveal,
+  .unlockable-effect-reveal::after,
+  .ot-button {
+    animation: none;
+    transition: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .ot-overlay-backdrop {
+    align-items: flex-end;
+  }
+}
