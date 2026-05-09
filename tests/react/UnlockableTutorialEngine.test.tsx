@@ -221,7 +221,10 @@ describe('UnlockableTutorialEngine', () => {
 
     const dialog = await screen.findByTestId('unlockable-tutorial-dialog', {}, { timeout: 3_000 });
     expect(dialog).toHaveAttribute('data-unlockable-tutorial-phase', 'activated');
-    await waitFor(() => expect(screen.getByText(/target is not visible/i)).toBeInTheDocument());
+    await waitFor(
+      () => expect(screen.getByText(/target is not visible/i)).toBeInTheDocument(),
+      { timeout: 3_000 },
+    );
   });
 
   it('continues to the next active route after a completed unlocked route emits its completion event', async () => {

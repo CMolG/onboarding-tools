@@ -1,0 +1,56 @@
+name: Feature request
+description: Suggest a new capability or improvement.
+title: "[Feature] "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for thinking about how to improve onboarding-tools. Search the
+        open issues and discussions first — your idea may already be tracked.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: |
+        Describe the use case. "I'm trying to do X but the library forces me
+        to do Y" beats "wouldn't it be cool if…".
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How would you want the API to look or behave?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Workarounds you tried, and why they were not enough.
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Where does this belong?
+      options:
+        - core (pure logic, no React)
+        - react (components/hooks)
+        - testing (test utilities)
+        - styles / theming
+        - documentation
+        - tooling / CI
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow this project's [Code of Conduct](../blob/main/CODE_OF_CONDUCT.md).
+          required: true

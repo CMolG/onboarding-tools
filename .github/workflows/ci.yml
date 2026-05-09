@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel in-progress runs on the same branch when a new commit lands.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: verify (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['18', '20', '22']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify zero runtime dependencies
+        run: |
+          deps=$(node -p "Object.keys(require('./package.json').dependencies || {}).length")
+          if [ "$deps" != "0" ]; then
+            echo "::error::package.json has $deps runtime dependencies, expected 0"
+            exit 1
+          fi
+
+      - name: Verify pack contents
+        run: npm pack --dry-run
+
+  lint-package:
+    name: lint package metadata
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: publint
+        run: npx --yes publint@latest
+
+      - name: arethetypeswrong
+        run: |
+          npm run build
+          npx --yes @arethetypeswrong/cli@latest --pack . --ignore-rules cjs-resolves-to-esm

@@ -1,14 +1,33 @@
 {
   "name": "onboarding-tools",
   "version": "0.1.0",
-  "description": "Declarative unlockable onboarding, progressive disclosure, and tutorial overlays for React apps.",
+  "description": "Declarative unlockable onboarding, progressive disclosure, and tutorial overlays for React apps. Zero runtime dependencies, framework-agnostic.",
   "type": "module",
+  "author": "Carlos <carlos972004@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/CMolG/onboarding-tools#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CMolG/onboarding-tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CMolG/onboarding-tools/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "sideEffects": [
     "./dist/styles.css"
   ],
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "AGENTS.md"
   ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -39,14 +58,10 @@
     "prepack": "npm run build"
   },
   "peerDependencies": {
-    "react": ">=18 <20",
-    "react-dom": ">=18 <20"
+    "react": ">=18 <20"
   },
   "peerDependenciesMeta": {
     "react": {
-      "optional": true
-    },
-    "react-dom": {
       "optional": true
     }
   },
@@ -69,7 +84,15 @@
     "tutorial",
     "react",
     "unlockable",
-    "product-tour"
-  ],
-  "license": "MIT"
+    "product-tour",
+    "feature-flags",
+    "personalization",
+    "archetype",
+    "tutorial-overlay",
+    "spotlight",
+    "coachmark",
+    "user-onboarding",
+    "zero-deps",
+    "typescript"
+  ]
 }

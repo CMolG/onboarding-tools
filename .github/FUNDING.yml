@@ -1,0 +1,11 @@
+# Replace or remove these once you have funding accounts set up.
+# Lines that are still placeholders will be ignored by GitHub if left empty.
+
+github: []
+# Uncomment and fill the platforms you actually use:
+# github: [CMolG]
+# ko_fi: yourhandle
+# buy_me_a_coffee: yourhandle
+# patreon: yourhandle
+# open_collective: onboarding-tools
+# custom: ['https://your.site/donate']
