@@ -495,8 +495,8 @@ loop to settle before asserting the fallback note appears.
 
 - Full README with concepts, API surface, framework matrix:
   [`README.md`](./README.md).
-- Two runnable demos: [`examples/vite`](./examples/vite) and
-  [`examples/next`](./examples/next).
+- Runnable demo: [`examples/next`](./examples/next) (Next.js 16 App
+  Router). Includes a `vercel.json` for one-click Vercel deployment.
 - Public types live in `dist/core/types.d.ts` and are exported from the
   package root.
 - Contribution rules and conventions: [`CONTRIBUTING.md`](./CONTRIBUTING.md).

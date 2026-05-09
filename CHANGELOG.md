@@ -13,17 +13,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   operational guide for AI coding agents covering the install,
   decision tree, criteria DSL, framework recipes, gotchas, and common
   errors.
-- Two runnable example apps under `examples/`: a Vite + react-router-dom
-  demo and a Next.js 14 (App Router) demo. Both wire the same three
-  onboarding patterns (automatic, event-gated, archetype-gated) so the
-  router adapter difference is the only contrast. README links them
-  through StackBlitz and CodeSandbox so the demos are runnable in-browser.
+- Runnable Next.js 16 (App Router) example under `examples/next`. Wires
+  the three main onboarding patterns (automatic, event-gated,
+  archetype-gated). Ships with a `vercel.json` so this repository can
+  be deployed straight to Vercel by pointing at `examples/next` as the
+  project root — the example's install script builds the parent
+  package before `next build` runs.
+
+### Removed
+
+- The Vite example previously under `examples/vite`. The only
+  meaningful difference from the Next.js example was the router
+  adapter (~5 lines) and the `'use client'` boundary; both router
+  adapter recipes remain documented in the README.
 
 ## [0.1.0] - 2026-05-09
 
 ### Added
 
-- First public release extracted from `job-hunter-vite`.
+- First public release.
 - Core unlock state machine (`HIDDEN` → `ELIGIBLE` → `UNLOCKING` → `UNLOCKED`)
   with persistence, declarative criteria DSL (`event`, `archetype`, `flag`,
   `state`, `unlockable`, `resolver`, plus `all`/`any`/`not` combinators),

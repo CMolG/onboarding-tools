@@ -141,6 +141,6 @@ describe('unlock state machine', () => {
   });
 
   it('creates a namespaced storage key', () => {
-    expect(createStorageKey('job-hunter')).toBe('unlockable:state:job-hunter');
+    expect(createStorageKey('demo-app')).toBe('unlockable:state:demo-app');
   });
 });

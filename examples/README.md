@@ -1,7 +1,7 @@
 # Examples
 
-Two minimal apps that demonstrate the same three onboarding patterns on
-different stacks:
+A single Next.js (App Router) demo that exercises the three main
+onboarding-tools patterns:
 
 | Pattern              | What it shows                                                |
 | -------------------- | ------------------------------------------------------------ |
@@ -9,28 +9,35 @@ different stacks:
 | Manual + event-gated | A component hidden until an event is emitted, then unlocked  |
 | Archetype-gated      | A component that only appears for users tagged "power-user"  |
 
-| Example                | Stack                                       | Router adapter           |
-| ---------------------- | ------------------------------------------- | ------------------------ |
-| [`vite/`](./vite)      | Vite + React 18 + react-router-dom          | `useLocation`/`useNavigate` |
-| [`next/`](./next)      | Next.js 14 (App Router) + React 18          | `usePathname`/`useRouter`   |
+The example installs `onboarding-tools` from the **local workspace** via
+`file:../..` and runs the package's build via the `prebuild` / `predev`
+hooks, so the example is always in sync with the latest source.
 
-Each example installs `onboarding-tools` from the **local workspace** via
-`file:../..`, so you can run them without publishing. To switch to the
-published version, just replace `"file:../.."` with `"^0.1.0"` in the
-example's `package.json`.
+To switch to the published version once `onboarding-tools` is on npm,
+replace `"file:../.."` with `"^0.1.0"` (or the latest version) in
+`examples/next/package.json`, and remove the `prebuild` / `predev`
+scripts.
 
 ## Running locally
 
 ```bash
-# From the repo root, build the package once:
-npm install
-npm run build
-
-# Then run an example:
-cd examples/vite       # or examples/next
+# From the example folder:
+cd examples/next
 npm install
 npm run dev
 ```
 
-> ⚠️ Whenever you change something in `../../src/`, re-run `npm run build`
-> in the repo root so the example picks up the new `dist/`.
+The `predev` script makes sure the parent package's `dist/` is fresh.
+
+## Deploying to Vercel
+
+The example ships with a `vercel.json` that builds the parent package
+before the Next.js app, so this repository can be deployed straight to
+Vercel without any extra configuration.
+
+1. In Vercel, **New Project** → Import this repository.
+2. Set **Root Directory** to `examples/next`.
+3. Leave Framework, Build, Output, and Install commands as detected —
+   `vercel.json` overrides them with the right values.
+
+The deployed URL is publishable as a live demo.

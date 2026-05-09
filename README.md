@@ -211,36 +211,35 @@ engine narrates the new capability.
 ╚═══════════════════════════════════════════════════════════════════╝
 ```
 
-Two runnable demos live in [`examples/`](./examples). Each one wires the
-same three patterns — automatic, event-gated, and archetype-gated — so
-you can compare adapters side by side.
+A runnable Next.js (App Router) demo lives in
+[`examples/next`](./examples/next). It wires the three main patterns —
+automatic, event-gated, and archetype-gated — and is also the easiest
+way to see the unlock animation, the manual confirmation overlay, and
+the tutorial engine in action.
 
-### [`examples/vite`](./examples/vite) · Vite + react-router-dom
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FCMolG%2Fonboarding-tools&root-directory=examples%2Fnext&project-name=onboarding-tools-demo&repository-name=onboarding-tools-demo)
 
-Router adapter using `useLocation` / `useNavigate`.
+The deploy button targets `examples/next` as the project root. The
+example's `vercel.json` builds the parent `onboarding-tools` package
+before `next build`, so no extra setup is required.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz_1x.svg)](https://stackblitz.com/github/CMolG/onboarding-tools/tree/main/examples/vite?title=onboarding-tools+%C2%B7+Vite&file=src%2FApp.tsx)
-[![Edit in CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/github/CMolG/onboarding-tools/main?file=%2Fexamples%2Fvite%2Fsrc%2FApp.tsx)
-
-### [`examples/next`](./examples/next) · Next.js 14 (App Router)
-
-Router adapter using `usePathname` / `useRouter`, with a `'use client'`
-provider boundary.
-
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz_1x.svg)](https://stackblitz.com/github/CMolG/onboarding-tools/tree/main/examples/next?title=onboarding-tools+%C2%B7+Next.js&file=app%2Fpage.tsx)
-[![Edit in CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/github/CMolG/onboarding-tools/main?file=%2Fexamples%2Fnext%2Fapp%2Fpage.tsx)
-
-Run them locally straight from the repo:
+Run it locally:
 
 ```bash
-npm install && npm run build       # build the package once
-cd examples/vite                   # or examples/next
+cd examples/next
 npm install
 npm run dev
 ```
 
-Each example links the package via `file:../..`, so changes to `src/`
-flow into the demo as soon as you re-run `npm run build` at the root.
+The example links the package via `file:../..` and runs `npm run build`
+on the parent through a `predev` / `prebuild` hook, so any edit in
+`src/` lands in the demo on the next dev-server start.
+
+> **Why no Vite example?** The only difference between Vite and Next.js
+> here is the router adapter (~5 lines) and the `'use client'`
+> boundary. Maintaining two near-identical demos was redundant — the
+> router-adapter pattern is documented under
+> [Router adapter](#-router-adapter) for both stacks.
 
 ---
 

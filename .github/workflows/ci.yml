@@ -22,10 +22,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node ${{ matrix.node }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
           cache: 'npm'
@@ -58,10 +58,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
@@ -69,10 +69,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build
+        run: npm run build
+
       - name: publint
         run: npx --yes publint@latest
 
+      # ESM-only profile checks the resolutions consumers actually use
+      # (node16 ESM + bundler). Internal-resolution-error is ignored
+      # because attw's sandbox does not install peer deps (react). The
+      # styles.css entry point is excluded because attw cannot type-check
+      # CSS files.
       - name: arethetypeswrong
         run: |
-          npm run build
-          npx --yes @arethetypeswrong/cli@latest --pack . --ignore-rules cjs-resolves-to-esm
+          npx --yes @arethetypeswrong/cli@latest \
+            --pack . \
+            --profile esm-only \
+            --ignore-rules internal-resolution-error \
+            --exclude-entrypoints onboarding-tools/styles.css
