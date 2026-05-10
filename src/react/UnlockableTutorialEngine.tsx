@@ -8,20 +8,33 @@ import type { UnlockTutorialStep } from '../core/types';
 const VIEWPORT_MARGIN = 24;
 const CARD_WIDTH = 340;
 const CARD_HEIGHT = 230;
-const MAX_MISSES = 90;
+const MAX_MISSES = 30;
 const SPOTLIGHT_PADDING = 8;
 
 export interface UnlockableTutorialEngineProviderProps {
   readonly children: ReactNode;
   readonly router?: OnboardingRouterAdapter;
   readonly isRouteDisabled?: (pathname: string) => boolean;
+  readonly completeActivationAnnouncement?: boolean;
+  readonly autoNavigateManualActivation?: boolean;
 }
 
-export function UnlockableTutorialEngineProvider({ children, router, isRouteDisabled }: UnlockableTutorialEngineProviderProps) {
+export function UnlockableTutorialEngineProvider({
+  children,
+  router,
+  isRouteDisabled,
+  completeActivationAnnouncement = true,
+  autoNavigateManualActivation = true,
+}: UnlockableTutorialEngineProviderProps) {
   return (
     <UnlockableTutorialEngineContext.Provider value>
       {children}
-      <UnlockableTutorialEngine router={router} isRouteDisabled={isRouteDisabled} />
+      <UnlockableTutorialEngine
+        router={router}
+        isRouteDisabled={isRouteDisabled}
+        completeActivationAnnouncement={completeActivationAnnouncement}
+        autoNavigateManualActivation={autoNavigateManualActivation}
+      />
     </UnlockableTutorialEngineContext.Provider>
   );
 }
@@ -29,9 +42,16 @@ export function UnlockableTutorialEngineProvider({ children, router, isRouteDisa
 export interface UnlockableTutorialEngineProps {
   readonly router?: OnboardingRouterAdapter;
   readonly isRouteDisabled?: (pathname: string) => boolean;
+  readonly completeActivationAnnouncement?: boolean;
+  readonly autoNavigateManualActivation?: boolean;
 }
 
-export function UnlockableTutorialEngine({ router: routerProp, isRouteDisabled }: UnlockableTutorialEngineProps) {
+export function UnlockableTutorialEngine({
+  router: routerProp,
+  isRouteDisabled,
+  completeActivationAnnouncement: shouldCompleteActivationAnnouncement = true,
+  autoNavigateManualActivation = true,
+}: UnlockableTutorialEngineProps) {
   const flow = useUnlockableFlow();
   const unlockableContext = useUnlockableContext();
   const router = routerProp ?? flow.router;
@@ -66,6 +86,8 @@ export function UnlockableTutorialEngine({ router: routerProp, isRouteDisabled }
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const [fallback, setFallback] = useState(false);
   const rafRef = useRef(0);
+  const lastTargetRectRef = useRef<DOMRect | null>(null);
+  const fallbackRef = useRef(false);
   const pendingActivationAnnouncements = useRef(new Set<string>());
   const acknowledgedActivationAnnouncements = useRef(new Set<string>());
 
@@ -135,7 +157,7 @@ export function UnlockableTutorialEngine({ router: routerProp, isRouteDisabled }
     !flow.isStageComplete(activeStage.id) &&
     unlockable.status !== 'UNLOCKED' &&
     activeStage.definition.activation !== 'manual' &&
-    (unlockable.status === 'ELIGIBLE' || activeStage.definition.activation === 'automatic'),
+    (unlockable.status === 'ELIGIBLE' || unlockable.status === 'UNLOCKING'),
   );
   const visible = isActivationAnnouncement || preActivationVisible;
 
@@ -146,6 +168,8 @@ export function UnlockableTutorialEngine({ router: routerProp, isRouteDisabled }
   useEffect(() => {
     setStepIndex(0);
     setTargetRect(null);
+    lastTargetRectRef.current = null;
+    fallbackRef.current = false;
     setFallback(false);
   }, [renderStage?.id, isActivationAnnouncement]);
 
@@ -177,13 +201,16 @@ export function UnlockableTutorialEngine({ router: routerProp, isRouteDisabled }
     }
 
     if (router && activeStage.route && activeStage.route !== pathname) {
+      if (!autoNavigateManualActivation) {
+        return;
+      }
       router.navigate(activeStage.route);
       return;
     }
 
     pendingActivationAnnouncements.current.add(activeStage.id);
     unlockable.confirmUnlock();
-  }, [activeStage, manualActivationPending, pathname, router, unlockable]);
+  }, [activeStage, autoNavigateManualActivation, manualActivationPending, pathname, router, unlockable]);
 
   useEffect(() => {
     if (isActivationAnnouncement || disabledForRoute || !shouldNavigateToActiveStage || !visible || !route || route === pathname) {
@@ -199,29 +226,78 @@ export function UnlockableTutorialEngine({ router: routerProp, isRouteDisabled }
     }
 
     let misses = 0;
-    const track = () => {
+    let retryTimeout = 0;
+    let stopped = false;
+
+    const updateTargetRect = (): boolean => {
       if (!targetSelector) {
-        setFallback(true);
-        return;
+        if (!fallbackRef.current) {
+          fallbackRef.current = true;
+          setFallback(true);
+        }
+        return false;
       }
 
       const target = document.querySelector(targetSelector);
       if (target) {
-        setTargetRect(normalizeRect(target.getBoundingClientRect()));
-        setFallback(false);
+        const nextRect = normalizeRect(target.getBoundingClientRect());
+        if (!areRectsEqual(lastTargetRectRef.current, nextRect)) {
+          lastTargetRectRef.current = nextRect;
+          setTargetRect(nextRect);
+        }
+        if (fallbackRef.current) {
+          fallbackRef.current = false;
+          setFallback(false);
+        }
         misses = 0;
+        return true;
       } else {
         misses += 1;
-        if (misses >= MAX_MISSES) {
+        if (misses >= MAX_MISSES && !fallbackRef.current) {
+          fallbackRef.current = true;
           setFallback(true);
-          return;
         }
+        return false;
       }
-      rafRef.current = requestAnimationFrame(track);
     };
 
-    rafRef.current = requestAnimationFrame(track);
-    return () => cancelAnimationFrame(rafRef.current);
+    const scheduleRetry = () => {
+      if (stopped) {
+        return;
+      }
+      retryTimeout = window.setTimeout(() => {
+        rafRef.current = requestAnimationFrame(() => {
+          if (!updateTargetRect()) {
+            scheduleRetry();
+          }
+        });
+      }, fallbackRef.current ? 250 : 16);
+    };
+
+    const scheduleUpdate = () => {
+      cancelAnimationFrame(rafRef.current);
+      window.clearTimeout(retryTimeout);
+      rafRef.current = requestAnimationFrame(() => {
+        if (!updateTargetRect()) {
+          scheduleRetry();
+        }
+      });
+    };
+
+    scheduleUpdate();
+    window.addEventListener('resize', scheduleUpdate);
+    window.addEventListener('scroll', scheduleUpdate, true);
+    const mutationObserver = new MutationObserver(scheduleUpdate);
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      stopped = true;
+      cancelAnimationFrame(rafRef.current);
+      window.clearTimeout(retryTimeout);
+      window.removeEventListener('resize', scheduleUpdate);
+      window.removeEventListener('scroll', scheduleUpdate, true);
+      mutationObserver.disconnect();
+    };
   }, [targetSelector, visible, pathname]);
 
   const closeStage = useCallback(() => {
@@ -236,13 +312,13 @@ export function UnlockableTutorialEngine({ router: routerProp, isRouteDisabled }
       return;
     }
     const completionEvent = renderStage.completionEvent ?? renderStage.definition.flow?.completionEvent;
-    if (completionEvent && !events.includes(completionEvent)) {
+    if (shouldCompleteActivationAnnouncement && completionEvent && !events.includes(completionEvent)) {
       unlockableContext.emitEvent(completionEvent);
     }
     acknowledgedActivationAnnouncements.current.add(renderStage.id);
     pendingActivationAnnouncements.current.delete(renderStage.id);
     setActivationAnnouncementStageId(null);
-  }, [events, renderStage, unlockableContext]);
+  }, [events, renderStage, shouldCompleteActivationAnnouncement, unlockableContext]);
 
   const handleAction = useCallback(() => {
     if (!renderStage || !step) {
@@ -424,6 +500,19 @@ function normalizeRect(rect: DOMRect): DOMRect {
   const right = clamp(rect.right, left, window.innerWidth);
   const bottom = clamp(rect.bottom, top, window.innerHeight);
   return new DOMRect(left, top, Math.max(0, right - left), Math.max(0, bottom - top));
+}
+
+function areRectsEqual(left: DOMRect | null, right: DOMRect): boolean {
+  if (!left) {
+    return false;
+  }
+
+  return (
+    Math.abs(left.left - right.left) < 0.5 &&
+    Math.abs(left.top - right.top) < 0.5 &&
+    Math.abs(left.width - right.width) < 0.5 &&
+    Math.abs(left.height - right.height) < 0.5
+  );
 }
 
 function getCardStyle(rect: DOMRect, position: UnlockTutorialStep['position']): CSSProperties {

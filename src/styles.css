@@ -10,8 +10,8 @@
   --ot-color-warning: #b45309;
   --ot-radius-card: 18px;
   --ot-radius-control: 10px;
-  --ot-shadow-card: 0 24px 80px rgb(15 23 42 / 24%);
-  --ot-shadow-spotlight: 0 0 0 4px rgb(194 91 60 / 18%), 0 0 28px rgb(194 91 60 / 26%);
+  --ot-shadow-card: 0 4px 14px rgb(15 23 42 / 10%);
+  --ot-shadow-spotlight: 0 0 0 2px rgb(194 91 60 / 28%);
   --ot-z-overlay: 70;
   --ot-z-tutorial: 80;
   --ot-font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -129,10 +129,6 @@
   outline-offset: 2px;
 }
 
-.ot-button:hover {
-  transform: translateY(-1px);
-}
-
 .ot-button-primary {
   color: var(--ot-color-primary-foreground);
   background: var(--ot-color-primary);
@@ -232,7 +228,7 @@
 
 @keyframes unlockable-activation-ring {
   0% { box-shadow: 0 0 0 0 rgb(194 91 60 / 0%), 0 0 0 0 rgb(194 91 60 / 0%); }
-  45% { box-shadow: 0 0 0 2px rgb(194 91 60 / 45%), 0 0 30px rgb(194 91 60 / 32%); }
+  45% { box-shadow: 0 0 0 2px rgb(194 91 60 / 24%); }
   100% { box-shadow: 0 0 0 0 rgb(194 91 60 / 0%), 0 0 0 0 rgb(194 91 60 / 0%); }
 }
 
